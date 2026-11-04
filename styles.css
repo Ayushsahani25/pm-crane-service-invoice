@@ -1,0 +1,78 @@
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f4f6f8;color:#17202a}.app-shell{display:flex;min-height:100vh}.sidebar{width:245px;background:#111827;color:#fff;padding:20px;display:flex;flex-direction:column}.brand-mini{display:flex;gap:10px;align-items:center;padding:5px 0 25px}.brand-mark{font-size:28px}.brand-mini small{display:block;color:#9ca3af;margin-top:3px}.sidebar nav{display:grid;gap:7px}.nav-btn{background:transparent;border:0;color:#cbd5e1;text-align:left;padding:12px 13px;border-radius:8px;font-size:14px;cursor:pointer}.nav-btn:hover,.nav-btn.active{background:#263244;color:#fff}.sidebar-footer{margin-top:auto;font-size:11px;color:#6b7280}.main{flex:1;min-width:0}.topbar{height:80px;background:#fff;border-bottom:1px solid #e5e7eb;padding:15px 28px;display:flex;align-items:center;justify-content:space-between}.topbar h1{margin:0;font-size:23px}.topbar p{margin:4px 0 0;color:#6b7280;font-size:13px}.page{display:none;padding:26px}.page.active{display:block}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.stat,.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px}.stat{padding:18px}.stat span{display:block;color:#6b7280;font-size:12px}.stat strong{display:block;font-size:25px;margin-top:7px}.dashboard-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}.card{padding:20px}.card h2{font-size:16px;margin:0 0 16px}.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.card-head h2{margin:0}.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.action-card{border:1px solid #e5e7eb;background:#fafafa;padding:20px;text-align:left;border-radius:10px;cursor:pointer}.action-card b{font-size:22px;display:block;margin-bottom:9px}.workflow{padding-left:20px;line-height:2.1;color:#4b5563}.editor-layout{display:grid;grid-template-columns:minmax(460px,1fr) minmax(500px,760px);gap:20px;align-items:start}.editor{display:grid;gap:15px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-grid .wide{grid-column:1/-1}.form-grid label,.tax-row label{font-size:12px;color:#4b5563}.form-grid input,.form-grid textarea,.form-grid select,.tax-row input,.tax-row select,.search{display:block;width:100%;margin-top:6px;border:1px solid #d1d5db;border-radius:7px;padding:9px 10px;font:inherit;font-size:13px;background:#fff}.primary,.secondary,.ghost,.icon-btn{border:0;border-radius:7px;padding:10px 14px;cursor:pointer;font-weight:600}.primary{background:#111827;color:#fff}.primary.small{padding:8px 12px}.secondary{background:#e5e7eb;color:#111827}.ghost{background:#eef2f7;color:#374151}.icon-btn{background:transparent;font-size:24px}.editor-actions{display:flex;gap:10px;flex-wrap:wrap}.tax-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:10px}.totals-box{margin-top:16px;border-top:1px solid #e5e7eb}.totals-box div{display:flex;justify-content:space-between;padding:7px 0;font-size:13px}.totals-box .grand{font-size:17px;border-top:2px solid #111827;margin-top:4px;padding-top:10px}.preview-panel{position:sticky;top:15px}.preview-toolbar{display:flex;justify-content:space-between;margin:0 0 9px;color:#4b5563;font-size:12px}.preview-toolbar span{color:#9ca3af}.invoice-paper{width:794px;min-height:1123px;background:#fff;margin:auto;padding:26px 24px 22px;box-shadow:0 5px 24px #0002;color:#111;font-family:"Times New Roman",serif;font-size:12px}.inv-border{border:1px solid #222;min-height:100%;padding:0}.inv-header{height:154px;text-align:center;border-bottom:1px solid #222;position:relative;padding-top:10px}.inv-title{font-size:26px;font-weight:700;margin-top:2px}.inv-sub{font-size:17px;font-weight:700;margin-top:3px}.inv-services{font-size:15px;margin-top:5px}.crane-icon{position:absolute;top:10px;width:92px;height:82px;overflow:hidden}.crane-icon img{width:100%;height:100%;object-fit:contain}.crane-left{left:7px}.crane-right{right:7px}.inv-address{font-size:12px;margin-top:5px}.inv-contact{font-size:10px;margin-top:3px}.tax-invoice{font-size:22px;font-weight:700;margin-top:5px}.info-grid{display:grid;grid-template-columns:1.2fr .8fr 1.15fr 1fr;border-bottom:1px solid #222}.info-grid>div{border-right:1px solid #222;min-height:48px;padding:5px}.info-grid>div:nth-child(4n){border-right:0}.info-label{font-weight:700}.customer-name{font-weight:700;text-align:center;font-size:14px;line-height:1.05}.customer-address{font-size:10px;line-height:1.05}.email-link{color:#0563c1;text-decoration:underline}.items-head,.item-row,.sum-row{display:grid;grid-template-columns:2.2fr 1.25fr .85fr 1.25fr 1.25fr}.items-head{background:#d6d6d6;font-weight:700}.items-head>div,.item-row>div,.sum-row>div{border-right:1px solid #222;border-bottom:1px solid #222;padding:4px;min-height:24px}.items-head>div:last-child,.item-row>div:last-child,.sum-row>div:last-child{border-right:0}.item-row{min-height:190px}.item-row>div{white-space:pre-wrap}.sum-row{grid-template-columns:2.2fr 1.25fr .85fr 1.25fr 1.25fr}.sum-label{grid-column:1/5;text-align:right;font-weight:700}.amount-words{grid-column:1/5;font-weight:700}.footer-area{display:grid;grid-template-columns:1fr 1fr;min-height:185px;padding:20px 8px 8px}.bank{line-height:1.45}.sign{text-align:right;padding-top:45px}.certificate{text-align:center;font-weight:700;border-top:1px solid #222;padding-top:9px}.thank{text-align:center;font-size:16px;font-weight:700;padding:9px}.remove-line{color:#b91c1c;background:#fee2e2;border:0;border-radius:6px;padding:6px;cursor:pointer}.line-editor{border:1px solid #e5e7eb;border-radius:9px;padding:12px;margin-bottom:10px}.line-grid{display:grid;grid-template-columns:1.1fr .7fr .8fr 1fr .8fr;gap:8px}.line-grid label{font-size:11px;color:#6b7280}.line-grid input,.line-grid textarea,.line-grid select{width:100%;margin-top:4px;padding:7px;border:1px solid #d1d5db;border-radius:6px}.line-grid .description{grid-column:1/4}.line-grid .remove{grid-column:5;text-align:right}.table-wrap{overflow:auto}.table-wrap table{width:100%;border-collapse:collapse;font-size:13px}.table-wrap th,.table-wrap td{border-bottom:1px solid #e5e7eb;padding:11px 8px;text-align:left;white-space:nowrap}.table-wrap th{color:#6b7280;font-size:11px;text-transform:uppercase}.table-wrap button{border:0;background:#eef2f7;border-radius:5px;padding:6px 8px;margin-right:4px;cursor:pointer}.muted{color:#6b7280;font-size:13px}.settings-grid{max-width:900px}.modal{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.hidden{display:none}.modal-box{background:#fff;border-radius:12px;padding:20px;width:min(650px,100%);box-shadow:0 20px 60px #0005}@media(max-width:1200px){.editor-layout{grid-template-columns:1fr}.preview-panel{position:static}.invoice-paper{transform-origin:top left;max-width:100%;overflow:hidden}.stats{grid-template-columns:1fr 1fr}}@media(max-width:800px){.sidebar{width:70px;padding:10px}.brand-mini div:not(.brand-mark),.nav-btn{font-size:0}.nav-btn:before{content:"•";font-size:20px}.main .page{padding:14px}.dashboard-grid{grid-template-columns:1fr}.form-grid,.tax-row{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.stats{grid-template-columns:1fr 1fr}.preview-panel{overflow:auto}.invoice-paper{width:794px}.topbar{padding:12px}.line-grid{grid-template-columns:1fr 1fr}.line-grid .description{grid-column:1/-1}.line-grid .remove{grid-column:auto}}
+
+/* PM Crane Service refinements */
+:root{color-scheme:light}
+button,input,select,textarea{font-family:inherit}
+button{transition:transform .12s ease,background .12s ease,box-shadow .12s ease}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+.primary:hover{background:#26364d;box-shadow:0 3px 10px #11182722}
+.secondary:hover,.ghost:hover,.table-wrap button:hover{background:#dbe3ed}
+.card{box-shadow:0 2px 8px #0f172a08}
+.stat{box-shadow:0 2px 8px #0f172a08}
+.stat strong{letter-spacing:-.5px}
+.settings-actions{margin-top:20px}
+.backup-note{margin:12px 0 0}
+.line-editor{background:#fbfcfe}
+.line-grid input:focus,.line-grid textarea:focus,.line-grid select:focus,
+.form-grid input:focus,.form-grid textarea:focus,.form-grid select:focus{border-color:#64748b;outline:2px solid #cbd5e1}
+.invoice-paper{box-shadow:0 8px 28px #0f172a20}
+.inv-header{overflow:hidden}
+.crane-icon img{display:block}
+.table-wrap td button{margin:2px 3px 2px 0}
+#page-settings .card{max-width:1100px}
+#page-settings .muted{line-height:1.6}
+@media(max-width:800px){
+  .sidebar{width:62px;flex-shrink:0}
+  .brand-mini{justify-content:center}
+  .brand-mark{font-size:24px}
+  .nav-btn{padding:12px 8px;text-align:center}
+  .nav-btn:before{content:"•";font-size:22px}
+  .nav-btn.active:before{content:"●"}
+  .sidebar-footer{display:none}
+  .topbar h1{font-size:19px}
+  .topbar p{font-size:11px}
+  .page{padding:12px}
+  .card{padding:15px}
+  .editor-actions button{flex:1 1 140px}
+}
+@media print{
+  @page{size:A4 portrait;margin:0}
+  html,body{background:#fff!important;margin:0!important;padding:0!important}
+  body *{visibility:hidden!important}
+  #invoice-preview,#invoice-preview *{visibility:visible!important}
+  #invoice-preview{position:absolute!important;left:0!important;top:0!important;width:210mm!important;min-height:297mm!important;margin:0!important;padding:7mm!important;box-shadow:none!important;transform:none!important}
+  .invoice-paper{width:196mm!important;min-height:283mm!important;padding:0!important;box-shadow:none!important}
+  .inv-border{min-height:283mm!important}
+  .inv-header,.info-grid,.items-head,.item-row,.sum-row,.footer-area,.certificate,.thank{break-inside:avoid}
+}
+.signature-settings{border-top:1px solid #e5e7eb;padding-top:14px}.signature-settings img{display:block;max-width:220px;max-height:75px;object-fit:contain;object-position:left center;margin:8px 0 12px}.upload-signature{display:inline-flex;align-items:center;cursor:pointer}.invoice-signature{display:inline-block;width:155px;height:58px;object-fit:contain;object-position:right center;vertical-align:middle;margin:3px 0 0}.sign{padding-top:30px}
+
+
+/* Invoice readability and crane artwork balance */
+.invoice-paper{font-size:13px}
+.inv-header{height:170px;padding-top:11px}
+.crane-icon{top:9px;width:126px;height:126px}
+.crane-icon img{width:100%;height:100%;object-fit:contain}
+.crane-left{left:5px}
+.crane-right{right:5px}
+.inv-title{font-size:29px;margin-top:3px}
+.inv-sub{font-size:19px;margin-top:4px}
+.inv-services{font-size:16px;margin-top:6px}
+.inv-address{font-size:13px;margin-top:6px}
+.inv-contact{font-size:11px;margin-top:4px}
+.tax-invoice{font-size:24px;margin-top:6px}
+.info-grid{font-size:12px}
+.info-grid>div{padding:6px;min-height:52px}
+.info-label{font-size:12px}
+.customer-name{font-size:15px;line-height:1.12}
+.customer-address{font-size:11px;line-height:1.15}
+.items-head,.item-row,.sum-row{font-size:12px}
+.items-head>div,.item-row>div,.sum-row>div{padding:5px;min-height:26px}
+.bank{font-size:13px;line-height:1.55}
+.sign{font-size:13px}
+.certificate{font-size:13px;padding-top:10px}
+.thank{font-size:17px}
+@media print{
+  .crane-icon{width:126px!important;height:126px!important}
+  .inv-header{height:170px!important}
+}

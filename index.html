@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PM Crane Service — Invoice Generator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-mini">
+        <div class="brand-mark">🏗️</div>
+        <div><strong>PM CRANE</strong><small>Invoice Manager</small></div>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+        <button class="nav-btn" data-page="invoice">Create New Invoice</button>
+        <button class="nav-btn" data-page="invoices">Saved Invoices</button>
+        <button class="nav-btn" data-page="customers">Customers / Vendors</button>
+        <button class="nav-btn" data-page="settings">Company Settings</button>
+      </nav>
+      <div class="sidebar-footer">Local-first • No server required</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="page-title">Dashboard</h1>
+          <p>PM Crane Service billing workspace</p>
+        </div>
+        <button class="primary" id="quick-new">+ New Invoice</button>
+      </header>
+
+      <section id="page-dashboard" class="page active">
+        <div class="stats">
+          <div class="stat"><span>Invoices</span><strong id="stat-invoices">0</strong></div>
+          <div class="stat"><span>Customers</span><strong id="stat-customers">0</strong></div>
+          <div class="stat"><span>Last Invoice</span><strong id="stat-last">—</strong></div>
+          <div class="stat"><span>Storage</span><strong>Browser</strong></div>
+        </div>
+        <div class="dashboard-grid">
+          <div class="card">
+            <h2>Quick actions</h2>
+            <div class="quick-actions">
+              <button class="action-card" data-page="invoice"><b>＋</b><span>Create New Invoice</span></button>
+              <button class="action-card" data-page="invoices"><b>▤</b><span>Saved Invoices</span></button>
+              <button class="action-card" data-page="customers"><b>👥</b><span>Customers / Vendors</span></button>
+              <button class="action-card" data-page="settings"><b>⚙</b><span>Company Settings</span></button>
+            </div>
+          </div>
+          <div class="card">
+            <h2>How it works</h2>
+            <ol class="workflow">
+              <li>Select or add customer</li>
+              <li>Enter crane/job details</li>
+              <li>Choose GST and rates</li>
+              <li>Check the live A4 preview</li>
+              <li>Save → Download PDF / Print</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-invoice" class="page">
+        <div class="editor-layout">
+          <div class="editor">
+            <div class="card">
+              <div class="card-head"><h2>Invoice Details</h2><button class="ghost" id="duplicate-current">Duplicate</button></div>
+              <div class="form-grid">
+                <label>Invoice Number<input id="invoiceNo" type="number" min="1"></label>
+                <label>Invoice Date<input id="invoiceDate" type="date"></label>
+                <label>Month / Work Date<input id="monthDate" type="date"></label>
+                <label>Work Order Number<input id="workOrder" placeholder="Optional"></label>
+                <label class="wide">Work Order / Confirmation Details<textarea id="confirmation" rows="2" placeholder="e.g. Verbal Confirmation by Mr. Amit Kadam"></textarea></label>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><h2>Customer / Client</h2><button class="ghost" id="save-customer-inline">Save Customer</button></div>
+              <div class="form-grid">
+                <label class="wide">Select Customer<select id="customerSelect"><option value="">— New customer —</option></select></label>
+                <label>Company Name<input id="customerName"></label>
+                <label>GSTIN<input id="customerGSTIN" placeholder="27ABCDE1234F1Z5"></label>
+                <label class="wide">Billing Address<textarea id="customerAddress" rows="3"></textarea></label>
+                <label>Email<input id="customerEmail" type="email"></label>
+                <label>Contact Person<input id="customerContact"></label>
+                <label>Mobile Number<input id="customerMobile"></label>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <h2>Crane / Job Details</h2>
+                <button class="primary small" id="add-line">+ Add Line</button>
+              </div>
+              <div id="line-items"></div>
+            </div>
+
+            <div class="card">
+              <h2>GST & Totals</h2>
+              <div class="tax-row">
+                <label>Tax Mode<select id="taxMode"><option value="cgstsgst">CGST + SGST</option><option value="igst">IGST</option><option value="none">No Tax</option></select></label>
+                <label>CGST %<input id="cgstRate" type="number" step="0.01" value="9"></label>
+                <label>SGST %<input id="sgstRate" type="number" step="0.01" value="9"></label>
+                <label>IGST %<input id="igstRate" type="number" step="0.01" value="18"></label>
+              </div>
+              <div class="totals-box">
+                <div><span>Taxable Amount</span><strong id="sum-taxable">₹0.00</strong></div>
+                <div><span>CGST</span><strong id="sum-cgst">₹0.00</strong></div>
+                <div><span>SGST</span><strong id="sum-sgst">₹0.00</strong></div>
+                <div><span>IGST</span><strong id="sum-igst">₹0.00</strong></div>
+                <div><span>Round Off</span><strong id="sum-round">₹0.00</strong></div>
+                <div class="grand"><span>Grand Total</span><strong id="sum-grand">₹0.00</strong></div>
+              </div>
+            </div>
+
+            <div class="editor-actions">
+              <button class="primary" id="save-invoice">Save Invoice</button>
+              <button class="secondary" id="download-pdf">Download PDF</button>
+              <button class="secondary" id="print-invoice">Print Invoice</button>
+            </div>
+          </div>
+
+          <div class="preview-panel">
+            <div class="preview-toolbar"><b>Live A4 Preview</b><span>Updates automatically</span></div>
+            <div id="invoice-preview-wrap">
+              <div id="invoice-preview" class="invoice-paper"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-invoices" class="page">
+        <div class="card">
+          <div class="card-head"><h2>Saved Invoices</h2><input id="invoice-search" class="search" placeholder="Search invoice/customer"></div>
+          <div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Date</th><th>Taxable</th><th>GST</th><th>Grand Total</th><th>Status</th><th>Actions</th></tr></thead><tbody id="invoice-list"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="page-customers" class="page">
+        <div class="card">
+          <div class="card-head"><h2>Customers / Vendors</h2><button class="primary" id="add-customer">+ Add Customer</button></div>
+          <div class="form-inline"><input id="customer-search" class="search" placeholder="Search customer"></div>
+          <div class="table-wrap"><table><thead><tr><th>Company</th><th>GSTIN</th><th>Contact</th><th>Mobile</th><th>Actions</th></tr></thead><tbody id="customer-list"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="page-settings" class="page">
+        <div class="card">
+          <h2>Company Settings</h2>
+          <p class="muted">These values are used on future invoices. The sample customer is not hard-coded.</p>
+          <div class="form-grid settings-grid" id="settings-form">
+            <label>Business Name<input data-setting="businessName"></label>
+            <label>Subtitle<input data-setting="subtitle"></label>
+            <label class="wide">Services<input data-setting="services"></label>
+            <label class="wide">Address<textarea data-setting="address" rows="2"></textarea></label>
+            <label>GSTIN<input data-setting="gstin"></label>
+            <label>Email<input data-setting="email"></label>
+            <label>Phone Numbers<input data-setting="phones"></label>
+            <label>Bank Name<input data-setting="bankName"></label>
+            <label>Account Number<input data-setting="accountNo"></label>
+            <label>Branch<input data-setting="branch"></label>
+            <label>IFSC<input data-setting="ifsc"></label>
+            <label>UDYAM Number<input data-setting="udyam"></label>
+            <label>Invoice Prefix<input data-setting="prefix"></label>
+            <label>Default GST Rate %<input type="number" data-setting="defaultGST"></label>
+            <div class="wide signature-settings"><b>Authorised Signatory Signature</b><p class="muted">This signature will appear automatically on invoices and PDFs.</p><img id="signature-preview" src="signature.png" alt="Signature preview"><div class="editor-actions"><label class="secondary upload-signature">Upload / Change Signature<input type="file" id="signature-file" accept="image/png,image/jpeg" hidden></label><button class="ghost" type="button" id="remove-signature">Remove Signature</button></div></div>
+          </div>
+          <div class="editor-actions settings-actions">
+            <button class="primary" id="save-settings">Save Settings</button>
+            <button class="secondary" id="reset-settings">Reset Defaults</button>
+            <button class="secondary" id="export-backup">Export Data Backup</button>
+            <button class="secondary" id="import-backup-trigger">Import Data Backup</button>
+            <input type="file" id="import-backup-file" accept="application/json,.json" hidden>
+          </div>
+          <p class="muted backup-note">Backups include your invoices, customers, numbering and company settings. Keep a copy somewhere safe.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="card-head"><h2 id="modal-title">Customer</h2><button class="icon-btn" id="modal-close">×</button></div>
+      <div class="form-grid">
+        <input type="hidden" id="modal-id">
+        <label>Company Name<input id="modal-name"></label>
+        <label>GSTIN<input id="modal-gstin"></label>
+        <label class="wide">Address<textarea id="modal-address" rows="3"></textarea></label>
+        <label>Email<input id="modal-email"></label>
+        <label>Contact Person<input id="modal-contact"></label>
+        <label>Mobile<input id="modal-mobile"></label>
+      </div>
+      <div class="editor-actions"><button class="primary" id="modal-save">Save Customer</button></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
