@@ -65,8 +65,8 @@ function addLine(data=freshLine()){
  <label>Rate<input data-k="rate" type="number" step="0.01" value="${data.rate||0}"></label>
  <label class="description">Job Description<textarea data-k="description" rows="2">${esc(data.description)}</textarea></label>
  <label>UDYAM<input data-k="udyam" value="${esc(data.udyam)}"></label>
- <label>Billing Type<select data-k="billingType"><option ${data.billingType==="Per Shift"?"selected":""}>Per Shift</option><option ${data.billingType==="Per Day"?"selected":""}>Per Day</option><option ${data.billingType==="Lumpsum"?"selected":""}>Lumpsum</option></select></label>
- <label>Quantity / Shifts<input data-k="qty" type="number" min="0" step="0.01" value="${data.qty||0}"></label>
+ <label>Billing Type<select data-k="billingType"><option ${data.billingType==="Per Shift"?"selected":""}>Per Shift</option><option ${data.billingType==="Per Day"?"selected":""}>Per Day</option><option ${data.billingType==="26 Days"?"selected":""}>26 Days</option></select></label>
+ <label>Quantity (Days / Shifts)<input data-k="qty" type="number" min="0" step="0.01" value="${data.qty||0}"></label>
  <div class="remove"><button class="remove-line" type="button">Remove</button></div>
  </div>`;
  wrap.querySelector(".remove-line").onclick=()=>{wrap.remove();calculate();renderPreview()};
@@ -106,7 +106,7 @@ function saveInvoice(){
 }
 function renderPreview(){
  const s=db.settings, i=getInvoice(), t=i.totals, mode=i.taxMode;
- const rows=i.lines.length?i.lines.map(l=>`<div class="item-row"><div><b>${esc(l.craneType)}</b>${l.regNo?`<br>${esc(l.regNo)}`:""} ${esc(l.description)}${l.udyam?`<br><br>UDYAM<br>${esc(l.udyam)}`:""}</div><div style="text-align:center">${esc(l.sac)}</div><div style="text-align:center">${esc(l.unit)}</div><div style="text-align:center">${esc(l.billingType)}<br>${money(l.rate)}<br><br>${esc(l.qty)} Shift${Number(l.qty)===1?"":"s"}</div><div style="text-align:right">${money((Number(l.rate)||0)*(Number(l.qty)||0))}</div></div>`).join(""):"<div class='item-row'><div></div><div></div><div></div><div></div><div></div></div>";
+ const rows=i.lines.length?i.lines.map(l=>`<div class="item-row"><div><b>${esc(l.craneType)}</b>${l.regNo?`<br>${esc(l.regNo)}`:""} ${esc(l.description)}${l.udyam?`<br><br>UDYAM<br>${esc(l.udyam)}`:""}</div><div style="text-align:center">${esc(l.sac)}</div><div style="text-align:center">${esc(l.unit)}</div><div style="text-align:center">${esc(l.billingType)}<br>${money(l.rate)}<br><br>${esc(l.qty)} ${l.billingType==="26 Days"||l.billingType==="Per Day"?"Day"+(Number(l.qty)===1?"":"s"):"Shift"+(Number(l.qty)===1?"":"s")}</div><div style="text-align:right">${money((Number(l.rate)||0)*(Number(l.qty)||0))}</div></div>`).join(""):"<div class='item-row'><div></div><div></div><div></div><div></div><div></div></div>";
  const taxRows=`<div class="sum-row"><div>CGST</div><div></div><div></div><div>${mode==="cgstsgst"?esc(i.cgstRate)+"%":""}</div><div style="text-align:right">${money(t.cgst)}</div></div><div class="sum-row"><div>SGST / IGST</div><div></div><div></div><div>${mode==="cgstsgst"?esc(i.sgstRate)+"%":mode==="igst"?esc(i.igstRate)+"%":""}</div><div style="text-align:right">${money(mode==="igst"?t.igst:t.sgst)}</div></div>`;
  const craneLeft=`<img src="crane-left.png" alt="Mobile crane">`;
  const craneRight=`<img src="crane-right.png" alt="Crane">`;
