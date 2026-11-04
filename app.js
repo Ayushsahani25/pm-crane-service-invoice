@@ -47,7 +47,7 @@ function numWords(n){
 function freshLine(){return {craneType:"70 TON",regNo:"",description:"Crane working in your job for loading & unloading purpose. Your job site.",sac:"997311",udyam:db.settings.udyam,unit:"1",billingType:"Per Shift",rate:40000,qty:1}}
 function newInvoice(){
   editingInvoiceId=null;
-  setVal("invoiceNo",db.nextInvoice); setVal("invoiceDate",dateISO()); setVal("monthDate",dateISO());
+  setVal("invoiceNo",db.nextInvoice); setVal("invoiceDate",dateISO()); setVal("monthDate",dateISO()); setVal("monthDateEnd",dateISO());
   ["workOrder","confirmation","customerName","customerGSTIN","customerAddress","customerEmail","customerContact","customerMobile"].forEach(id=>setVal(id,""));
   setVal("customerSelect","");
   setVal("taxMode","cgstsgst"); setVal("cgstRate",9); setVal("sgstRate",9); setVal("igstRate",18);
@@ -86,9 +86,10 @@ function calculate(){const t=totals();setText("sum-taxable",money(t.taxable));se
 function setText(id,v){document.getElementById(id).textContent=v}
 function getInvoice(){
  const t=totals();
- return {id:editingInvoiceId||crypto.randomUUID(),invoiceNo:Number(getVal("invoiceNo")),invoiceDate:getVal("invoiceDate"),monthDate:getVal("monthDate"),workOrder:getVal("workOrder"),confirmation:getVal("confirmation"),customer:{name:getVal("customerName"),gstin:getVal("customerGSTIN"),address:getVal("customerAddress"),email:getVal("customerEmail"),contact:getVal("customerContact"),mobile:getVal("customerMobile")},lines:lines(),taxMode:getVal("taxMode"),cgstRate:Number(getVal("cgstRate")),sgstRate:Number(getVal("sgstRate")),igstRate:Number(getVal("igstRate")),totals:t,createdAt:new Date().toISOString(),status:"Saved"}}
+ return {id:editingInvoiceId||crypto.randomUUID(),invoiceNo:Number(getVal("invoiceNo")),invoiceDate:getVal("invoiceDate"),monthDate:getVal("monthDate"),monthDateEnd:getVal("monthDateEnd"),workOrder:getVal("workOrder"),confirmation:getVal("confirmation"),customer:{name:getVal("customerName"),gstin:getVal("customerGSTIN"),address:getVal("customerAddress"),email:getVal("customerEmail"),contact:getVal("customerContact"),mobile:getVal("customerMobile")},lines:lines(),taxMode:getVal("taxMode"),cgstRate:Number(getVal("cgstRate")),sgstRate:Number(getVal("sgstRate")),igstRate:Number(getVal("igstRate")),totals:t,createdAt:new Date().toISOString(),status:"Saved"}}
 function loadInvoice(inv){
  editingInvoiceId=inv.id; ["invoiceNo","invoiceDate","monthDate","workOrder","confirmation"].forEach(k=>setVal(k,inv[k]));
+ setVal("monthDateEnd",inv.monthDateEnd||inv.monthDate||"");
  setVal("customerName",inv.customer.name);setVal("customerGSTIN",inv.customer.gstin);setVal("customerAddress",inv.customer.address);setVal("customerEmail",inv.customer.email);setVal("customerContact",inv.customer.contact);setVal("customerMobile",inv.customer.mobile);
  setVal("taxMode",inv.taxMode);setVal("cgstRate",inv.cgstRate);setVal("sgstRate",inv.sgstRate);setVal("igstRate",inv.igstRate);
  document.getElementById("line-items").innerHTML="";inv.lines.forEach(addLine);calculate();renderPreview();go("invoice");
@@ -96,6 +97,7 @@ function loadInvoice(inv){
 function saveInvoice(){
  const inv=getInvoice();
  if(!inv.customer.name.trim())return alert("Customer name is required.");
+ if(inv.monthDate&&inv.monthDateEnd&&inv.monthDateEnd<inv.monthDate)return alert("Month / Work Date end must be on or after the start date.");
  if(!/^\d+$/.test(String(inv.invoiceNo)))return alert("Invoice number is required.");
  if(inv.lines.some(l=>(Number(l.rate)||0)<0||(Number(l.qty)||0)<=0))return alert("Rate and quantity/shifts must be valid.");
  const duplicate=db.invoices.find(x=>x.invoiceNo===inv.invoiceNo&&x.id!==inv.id); if(duplicate)return alert("That invoice number already exists.");
@@ -113,7 +115,7 @@ function renderPreview(){
  <div class="info-grid">
  <div><span class="info-label">To,</span><br><br><span class="info-label">Name :</span></div><div class="customer-name">${esc(i.customer.name).replace(/\n/g,"<br>")}</div><div><span class="info-label">Invoice Date</span></div><div>${fmtDate(i.invoiceDate)}</div>
  <div><span class="info-label">Address :</span></div><div class="customer-address">${esc(i.customer.address).replace(/\n/g,"<br>")}</div><div><span class="info-label">Invoice No.</span></div><div>${esc(i.invoiceNo)}</div>
- <div><span class="info-label">GSTNO :</span> ${esc(i.customer.gstin)}</div><div class="customer-address">Email: <span class="email-link">${esc(i.customer.email)}</span></div><div><span class="info-label">Month Date.</span></div><div>${fmtDate(i.monthDate)}</div>
+ <div><span class="info-label">GSTNO :</span> ${esc(i.customer.gstin)}</div><div class="customer-address">Email: <span class="email-link">${esc(i.customer.email)}</span></div><div><span class="info-label">Month Date.</span></div><div>${fmtDate(i.monthDate)}${i.monthDateEnd&&i.monthDateEnd!==i.monthDate?` TO ${fmtDate(i.monthDateEnd)}`:""}</div>
  <div><span class="info-label">Work Order No.</span></div><div>${esc(i.workOrder)}</div><div><span class="info-label">Confirmation</span></div><div>${esc(i.confirmation)}</div>
  </div>
  <div class="items-head"><div>Particulars</div><div>SAC Code</div><div>Unit</div><div>Rate</div><div>Taxable Amt.</div></div>${rows}
@@ -137,7 +139,7 @@ function saveCustomerModal(){const c={id:document.getElementById("modal-id").val
 function saveInlineCustomer(){const c={id:crypto.randomUUID(),name:getVal("customerName").trim(),gstin:getVal("customerGSTIN").trim(),address:getVal("customerAddress").trim(),email:getVal("customerEmail").trim(),contact:getVal("customerContact").trim(),mobile:getVal("customerMobile").trim()};if(!c.name)return alert("Company name is required.");db.customers.push(c);saveDB();fillCustomerSelect();alert("Customer saved.")}
 function loadSettings(){document.querySelectorAll("[data-setting]").forEach(el=>el.value=db.settings[el.dataset.setting]??"");const p=document.getElementById("signature-preview");if(p){p.src=db.settings.signatureImage||"";p.style.display=db.settings.signatureImage?"block":"none"}}
 function saveSettings(){document.querySelectorAll("[data-setting]").forEach(el=>db.settings[el.dataset.setting]=el.value);saveDB();alert("Settings saved.");renderPreview()}
-function duplicateInvoice(inv){const copy=JSON.parse(JSON.stringify(inv));copy.id=crypto.randomUUID();copy.invoiceNo=db.nextInvoice++;copy.invoiceDate=dateISO();copy.monthDate=dateISO();copy.createdAt=new Date().toISOString();copy.status="Saved";db.invoices.unshift(copy);saveDB();loadInvoice(copy)}
+function duplicateInvoice(inv){const copy=JSON.parse(JSON.stringify(inv));copy.id=crypto.randomUUID();copy.invoiceNo=db.nextInvoice++;copy.invoiceDate=dateISO();copy.monthDate=dateISO();copy.monthDateEnd=dateISO();copy.createdAt=new Date().toISOString();copy.status="Saved";db.invoices.unshift(copy);saveDB();loadInvoice(copy)}
 async function makePDF(){
  const node=document.getElementById("invoice-preview"),canvas=await html2canvas(node,{scale:2,backgroundColor:"#fff",useCORS:true});
  const {jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});

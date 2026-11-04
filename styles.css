@@ -99,3 +99,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   .crane-icon{width:68px!important;height:58px!important}
   .inv-header{min-height:170px!important;height:auto!important;padding:10px 86px 8px!important}
 }
+
+/* Crane logo size adjustment: larger but clear of the company title */
+.inv-header{padding-left:108px;padding-right:108px}
+.crane-icon{width:92px;height:78px}
+@media print{
+  .inv-header{padding-left:108px!important;padding-right:108px!important}
+  .crane-icon{width:92px!important;height:78px!important}
+}
