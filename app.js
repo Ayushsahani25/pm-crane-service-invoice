@@ -51,7 +51,7 @@ function newInvoice(){
   ["workOrder","confirmation","customerName","customerGSTIN","customerAddress","customerEmail","customerContact","customerMobile"].forEach(id=>setVal(id,""));
   setVal("customerSelect","");
   setVal("taxMode","cgstsgst"); setVal("cgstRate",9); setVal("sgstRate",9); setVal("igstRate",18);
-  document.getElementById("line-items").innerHTML=""; addLine(); calculate(); renderPreview();
+  document.getElementById("line-items").innerHTML=""; document.getElementById("extra-charges").innerHTML=""; addLine(); calculate(); renderPreview();
 }
 function setVal(id,v){document.getElementById(id).value=v??""}
 function getVal(id){return document.getElementById(id).value}
@@ -62,22 +62,42 @@ function addLine(data=freshLine()){
  <label>Registration No.<input data-k="regNo" value="${esc(data.regNo)}"></label>
  <label>SAC Code<input data-k="sac" value="${esc(data.sac)}"></label>
  <label>Unit<input data-k="unit" value="${esc(data.unit)}"></label>
- <label>Rate<input data-k="rate" type="number" step="0.01" value="${data.rate||0}"></label>
+ <label>Rate / Total Charge<input data-k="rate" type="number" step="0.01" value="${data.rate||0}"></label>
  <label class="description">Job Description<textarea data-k="description" rows="2">${esc(data.description)}</textarea></label>
  <label>UDYAM<input data-k="udyam" value="${esc(data.udyam)}"></label>
  <label>Billing Type<select data-k="billingType"><option ${data.billingType==="Per Shift"?"selected":""}>Per Shift</option><option ${data.billingType==="Per Day"?"selected":""}>Per Day</option><option ${data.billingType==="26 Days"?"selected":""}>26 Days</option></select></label>
  <label>Quantity (Days / Shifts)<input data-k="qty" type="number" min="0" step="0.01" value="${data.qty||0}"></label>
+  <label>Normal Hours / Day<input value="10" readonly></label>
+  <label>OT Hours<input data-k="otHours" type="number" min="0" step="0.5" value="${data.otHours||0}"></label>
+  <label>OT Rate / Hour<input data-k="otRate" type="number" min="0" step="0.01" value="${data.otRate||0}"></label>
  <div class="remove"><button class="remove-line" type="button">Remove</button></div>
  </div>`;
  wrap.querySelector(".remove-line").onclick=()=>{wrap.remove();calculate();renderPreview()};
  wrap.querySelectorAll("input,textarea,select").forEach(x=>x.addEventListener("input",()=>{calculate();renderPreview()}));
  document.getElementById("line-items").appendChild(wrap);
 }
+function addExtraCharge(data={description:"",qty:1,rate:0}){
+ const wrap=document.createElement("div");wrap.className="extra-charge-row";
+ wrap.innerHTML=`<label>Description<input data-extra="description" placeholder="e.g. Room Rent / Fair / Diesel" value="${esc(data.description||"")}"></label>
+ <label>Quantity<input data-extra="qty" type="number" min="0" step="0.01" value="${data.qty??1}"></label>
+ <label>Rate<input data-extra="rate" type="number" min="0" step="0.01" value="${data.rate||0}"></label>
+ <label>Amount<input data-extra="amount" readonly value="${money((Number(data.qty)||0)*(Number(data.rate)||0))}"></label>
+ <button class="remove-line" type="button">Remove</button>`;
+ const refresh=()=>{const q=Number(wrap.querySelector('[data-extra="qty"]').value)||0,r=Number(wrap.querySelector('[data-extra="rate"]').value)||0;wrap.querySelector('[data-extra="amount"]').value=money(q*r);calculate();renderPreview()};
+ wrap.querySelectorAll("input:not([readonly])").forEach(x=>x.addEventListener("input",refresh));
+ wrap.querySelector(".remove-line").onclick=()=>{wrap.remove();calculate();renderPreview()};
+ document.getElementById("extra-charges").appendChild(wrap);
+}
+function extraCharges(){return [...document.querySelectorAll(".extra-charge-row")].map(w=>Object.fromEntries([...w.querySelectorAll("[data-extra]")].filter(x=>x.dataset.extra!=="amount").map(x=>[x.dataset.extra,x.type==="number"?Number(x.value):x.value])))}
 function lines(){
  return [...document.querySelectorAll(".line-editor")].map(w=>Object.fromEntries([...w.querySelectorAll("[data-k]")].map(x=>[x.dataset.k,x.type==="number"?Number(x.value):x.value])));
 }
 function totals(){
- const taxable=lines().reduce((a,l)=>a+(Number(l.rate)||0)*(Number(l.qty)||0),0);
+ const lineAmount=l=> (Number(l.rate)||0) * (l.billingType==="26 Days" ? 1 : (Number(l.qty)||0));
+  const craneTotal=lines().reduce((a,l)=>a+lineAmount(l),0);
+ const otTotal=lines().reduce((a,l)=>a+(Number(l.otHours)||0)*(Number(l.otRate)||0),0);
+ const extrasTotal=extraCharges().reduce((a,c)=>a+(Number(c.qty)||0)*(Number(c.rate)||0),0);
+ const taxable=craneTotal+otTotal+extrasTotal;
  const mode=getVal("taxMode"), cgst=mode==="cgstsgst"?taxable*(Number(getVal("cgstRate"))||0)/100:0, sgst=mode==="cgstsgst"?taxable*(Number(getVal("sgstRate"))||0)/100:0, igst=mode==="igst"?taxable*(Number(getVal("igstRate"))||0)/100:0;
  const raw=taxable+cgst+sgst+igst, rounded=Math.round(raw), round=rounded-raw;
  return {taxable,cgst,sgst,igst,round,grand:rounded};
@@ -86,27 +106,33 @@ function calculate(){const t=totals();setText("sum-taxable",money(t.taxable));se
 function setText(id,v){document.getElementById(id).textContent=v}
 function getInvoice(){
  const t=totals();
- return {id:editingInvoiceId||crypto.randomUUID(),invoiceNo:Number(getVal("invoiceNo")),invoiceDate:getVal("invoiceDate"),monthDate:getVal("monthDate"),monthDateEnd:getVal("monthDateEnd"),workOrder:getVal("workOrder"),confirmation:getVal("confirmation"),customer:{name:getVal("customerName"),gstin:getVal("customerGSTIN"),address:getVal("customerAddress"),email:getVal("customerEmail"),contact:getVal("customerContact"),mobile:getVal("customerMobile")},lines:lines(),taxMode:getVal("taxMode"),cgstRate:Number(getVal("cgstRate")),sgstRate:Number(getVal("sgstRate")),igstRate:Number(getVal("igstRate")),totals:t,createdAt:new Date().toISOString(),status:"Saved"}}
+ return {id:editingInvoiceId||crypto.randomUUID(),invoiceNo:Number(getVal("invoiceNo")),invoiceDate:getVal("invoiceDate"),monthDate:getVal("monthDate"),monthDateEnd:getVal("monthDateEnd"),workOrder:getVal("workOrder"),confirmation:getVal("confirmation"),customer:{name:getVal("customerName"),gstin:getVal("customerGSTIN"),address:getVal("customerAddress"),email:getVal("customerEmail"),contact:getVal("customerContact"),mobile:getVal("customerMobile")},lines:lines(),extraCharges:extraCharges(),taxMode:getVal("taxMode"),cgstRate:Number(getVal("cgstRate")),sgstRate:Number(getVal("sgstRate")),igstRate:Number(getVal("igstRate")),totals:t,createdAt:new Date().toISOString(),status:"Saved"}}
 function loadInvoice(inv){
  editingInvoiceId=inv.id; ["invoiceNo","invoiceDate","monthDate","workOrder","confirmation"].forEach(k=>setVal(k,inv[k]));
  setVal("monthDateEnd",inv.monthDateEnd||inv.monthDate||"");
  setVal("customerName",inv.customer.name);setVal("customerGSTIN",inv.customer.gstin);setVal("customerAddress",inv.customer.address);setVal("customerEmail",inv.customer.email);setVal("customerContact",inv.customer.contact);setVal("customerMobile",inv.customer.mobile);
  setVal("taxMode",inv.taxMode);setVal("cgstRate",inv.cgstRate);setVal("sgstRate",inv.sgstRate);setVal("igstRate",inv.igstRate);
- document.getElementById("line-items").innerHTML="";inv.lines.forEach(addLine);calculate();renderPreview();go("invoice");
+ document.getElementById("line-items").innerHTML="";inv.lines.forEach(addLine);
+ document.getElementById("extra-charges").innerHTML="";(inv.extraCharges||[]).forEach(addExtraCharge);calculate();renderPreview();go("invoice");
 }
 function saveInvoice(){
  const inv=getInvoice();
  if(!inv.customer.name.trim())return alert("Customer name is required.");
  if(inv.monthDate&&inv.monthDateEnd&&inv.monthDateEnd<inv.monthDate)return alert("Month / Work Date end must be on or after the start date.");
  if(!/^\d+$/.test(String(inv.invoiceNo)))return alert("Invoice number is required.");
- if(inv.lines.some(l=>(Number(l.rate)||0)<0||(Number(l.qty)||0)<=0))return alert("Rate and quantity/shifts must be valid.");
+ if(inv.lines.some(l=>(Number(l.rate)||0)<0||(Number(l.qty)||0)<=0||(Number(l.otHours)||0)<0||(Number(l.otRate)||0)<0))return alert("Rate, quantity, and OT values must be valid.");
+ if((inv.extraCharges||[]).some(c=>(Number(c.qty)||0)<0||(Number(c.rate)||0)<0))return alert("Additional charge quantity and rate must be valid.");
  const duplicate=db.invoices.find(x=>x.invoiceNo===inv.invoiceNo&&x.id!==inv.id); if(duplicate)return alert("That invoice number already exists.");
  const idx=db.invoices.findIndex(x=>x.id===inv.id); if(idx>=0)db.invoices[idx]=inv;else db.invoices.unshift(inv);
  db.nextInvoice=Math.max(db.nextInvoice,inv.invoiceNo+1);saveDB();editingInvoiceId=inv.id;alert("Invoice saved.");renderPreview();
 }
 function renderPreview(){
  const s=db.settings, i=getInvoice(), t=i.totals, mode=i.taxMode;
- const rows=i.lines.length?i.lines.map(l=>`<div class="item-row"><div><b>${esc(l.craneType)}</b>${l.regNo?`<br>${esc(l.regNo)}`:""} ${esc(l.description)}${l.udyam?`<br><br>UDYAM<br>${esc(l.udyam)}`:""}</div><div style="text-align:center">${esc(l.sac)}</div><div style="text-align:center">${esc(l.unit)}</div><div style="text-align:center">${esc(l.billingType)}<br>${money(l.rate)}<br><br>${esc(l.qty)} ${l.billingType==="26 Days"||l.billingType==="Per Day"?"Day"+(Number(l.qty)===1?"":"s"):"Shift"+(Number(l.qty)===1?"":"s")}</div><div style="text-align:right">${money((Number(l.rate)||0)*(Number(l.qty)||0))}</div></div>`).join(""):"<div class='item-row'><div></div><div></div><div></div><div></div><div></div></div>";
+ const rows=i.lines.length?i.lines.map(l=>`<div class="item-row"><div><b>${esc(l.craneType)}</b>${l.regNo?`<br>${esc(l.regNo)}`:""} ${esc(l.description)}${l.udyam?`<br><br>UDYAM<br>${esc(l.udyam)}`:""}</div><div style="text-align:center">${esc(l.sac)}</div><div style="text-align:center">${esc(l.unit)}</div><div style="text-align:center">${esc(l.billingType)}<br>${money(l.rate)}<br><br>${esc(l.qty)} ${l.billingType==="26 Days"||l.billingType==="Per Day"?"Day"+(Number(l.qty)===1?"":"s"):"Shift"+(Number(l.qty)===1?"":"s")}</div><div style="text-align:right">${money((Number(l.rate)||0)*(l.billingType==="26 Days"?1:(Number(l.qty)||0)))}</div></div>`).join(""):"<div class='item-row'><div></div><div></div><div></div><div></div><div></div></div>";
+ const chargeRows=[
+ ...i.lines.filter(l=>(Number(l.otHours)||0)>0).map(l=>({label:`OT Charges - ${l.craneType} (${l.otHours} hrs × ${money(l.otRate)})`,amount:(Number(l.otHours)||0)*(Number(l.otRate)||0)})),
+ ...(i.extraCharges||[]).filter(c=>c.description).map(c=>({label:`${c.description} (${c.qty} × ${money(c.rate)})`,amount:(Number(c.qty)||0)*(Number(c.rate)||0)}))
+ ].map(c=>`<div class="item-row additional-charge"><div>${esc(c.label)}</div><div></div><div></div><div></div><div style="text-align:right">${money(c.amount)}</div></div>`).join("");
  const taxRows=`<div class="sum-row"><div>CGST</div><div></div><div></div><div>${mode==="cgstsgst"?esc(i.cgstRate)+"%":""}</div><div style="text-align:right">${money(t.cgst)}</div></div><div class="sum-row"><div>SGST / IGST</div><div></div><div></div><div>${mode==="cgstsgst"?esc(i.sgstRate)+"%":mode==="igst"?esc(i.igstRate)+"%":""}</div><div style="text-align:right">${money(mode==="igst"?t.igst:t.sgst)}</div></div>`;
  const craneLeft=`<img src="crane-left.png" alt="Mobile crane">`;
  const craneRight=`<img src="crane-right.png" alt="Crane">`;
@@ -118,7 +144,7 @@ function renderPreview(){
  <div><span class="info-label">GSTNO :</span> ${esc(i.customer.gstin)}</div><div class="customer-address">Email: <span class="email-link">${esc(i.customer.email)}</span></div><div><span class="info-label">Month Date.</span></div><div>${fmtDate(i.monthDate)}${i.monthDateEnd&&i.monthDateEnd!==i.monthDate?` TO ${fmtDate(i.monthDateEnd)}`:""}</div>
  <div><span class="info-label">Work Order No.</span></div><div>${esc(i.workOrder)}</div><div><span class="info-label">Confirmation</span></div><div>${esc(i.confirmation)}</div>
  </div>
- <div class="items-head"><div>Particulars</div><div>SAC Code</div><div>Unit</div><div>Rate</div><div>Taxable Amt.</div></div>${rows}
+ <div class="items-head"><div>Particulars</div><div>SAC Code</div><div>Unit</div><div>Rate</div><div>Taxable Amt.</div></div>${rows}${chargeRows}
  <div class="sum-row"><div class="sum-label">Total</div><div style="text-align:right">${money(t.taxable)}</div></div>${taxRows}
  <div class="sum-row"><div class="sum-label">(Round off)</div><div style="text-align:right">${money(t.round)}</div></div>
  <div class="sum-row"><div class="sum-label">Total Amount</div><div style="text-align:right;font-weight:700">${money(t.grand)}</div></div>
@@ -185,6 +211,7 @@ document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",(
 document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.page==="invoice")newInvoice();go(b.dataset.page)}));
 document.getElementById("quick-new").onclick=()=>{newInvoice();go("invoice")};
 document.getElementById("add-line").onclick=()=>{addLine();calculate();renderPreview()};
+document.getElementById("add-extra-charge").onclick=()=>addExtraCharge();
 document.getElementById("save-invoice").onclick=saveInvoice;
 document.getElementById("download-pdf").onclick=makePDF;
 document.getElementById("print-invoice").onclick=()=>window.print();
