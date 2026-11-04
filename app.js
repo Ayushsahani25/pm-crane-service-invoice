@@ -121,7 +121,7 @@ function renderPreview(){
  <div class="sum-row"><div class="sum-label">(Round off)</div><div style="text-align:right">${money(t.round)}</div></div>
  <div class="sum-row"><div class="sum-label">Total Amount</div><div style="text-align:right;font-weight:700">${money(t.grand)}</div></div>
  <div class="sum-row"><div class="amount-words">In Words : ${esc(numWords(t.grand))}</div><div></div></div>
- <div class="footer-area"><div class="bank"><b>Bank Details:</b><br>Bank: ${esc(s.bankName)}<br>AC No. ${esc(s.accountNo)}<br>Branch: ${esc(s.branch)}<br>IFSC Code : ${esc(s.ifsc)}</div><div class="sign">For ${esc(s.businessName)}${s.signatureImage?`<br><img class="invoice-signature" src="${esc(s.signatureImage)}" alt="Authorised signature">`:"<br><br><br>"}<br><b>Proprietor</b></div></div>
+ <div class="footer-area"><div class="bank"><b>Bank Details:</b><br>Bank: ${esc(s.bankName)}<br>AC No. ${esc(s.accountNo)}<br>Branch: ${esc(s.branch)}<br>IFSC Code : ${esc(s.ifsc)}</div><div class="sign">${s.signatureImage?`<img class="invoice-signature" src="${esc(s.signatureImage)}" alt="Authorised signature">`:`For ${esc(s.businessName)}<br><br><br><b>Proprietor</b>`}</div></div>
  <div class="certificate">Certified that the particular given are true and correct.</div><div class="thank">Thank you</div>
  </div>`;
 }

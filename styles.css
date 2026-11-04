@@ -76,3 +76,26 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   .crane-icon{width:126px!important;height:126px!important}
   .inv-header{height:170px!important}
 }
+
+/* Mobile/readability refinement */
+.inv-border{display:block;width:100%;min-width:0}
+.inv-header{height:auto;min-height:170px;padding:10px 86px 8px}
+.crane-icon{top:10px;width:68px;height:58px}
+.crane-left{left:6px}
+.crane-right{right:6px}
+.inv-title{font-size:27px;line-height:1.12;margin-top:2px}
+.inv-sub{font-size:16px;line-height:1.15}
+.inv-services{font-size:13px;line-height:1.2}
+.inv-address{font-size:11px;line-height:1.2;overflow-wrap:anywhere}
+.inv-contact{font-size:9px;line-height:1.2;overflow-wrap:anywhere}
+.invoice-signature{display:inline-block;width:180px;max-width:100%;height:auto;max-height:58px;object-fit:contain;vertical-align:middle;margin:3px 0}
+.sign{padding-top:30px;text-align:right}
+@media(max-width:800px){
+  .preview-panel{overflow-x:auto}
+  .invoice-paper{width:794px;max-width:none}
+}
+@media print{
+  .inv-border{width:100%!important}
+  .crane-icon{width:68px!important;height:58px!important}
+  .inv-header{min-height:170px!important;height:auto!important;padding:10px 86px 8px!important}
+}
